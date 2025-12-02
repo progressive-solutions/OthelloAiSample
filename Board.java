@@ -96,16 +96,61 @@ public class Board {
     // --- その他、思考エンジンで使用する必要なメソッドをここに追加 ---
     // 例: 着手を適用し、新しい盤面状態（Boardオブジェクト）を返すメソッドなど
     
+    /**
+     * 指定位置の状態を返す
+     * @param r 行番号(0～7)
+     * @param c 列番号(0～7)
+     * @return  状態
+     *          0: Boad.EMPTY = 空
+     *          1: Boad.BLACK = 黒
+     *          2: Boad.WHITE = 白
+     */
     public int getCell(int r, int c) {
         if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) return -1;
         return cells[r][c];
     }
     
+    /**
+     * 自身が何色かを返す
+     * @return 色番号
+     *          1: Boad.BLACK = 黒
+     *          2: Boad.WHITE = 白
+     */
     public int getMyColor() {
         return myColor;
     }
     
+    /**
+     * 相手が何色かを返す
+     * @return 色番号
+     *          1: Boad.BLACK = 黒
+     *          2: Boad.WHITE = 白
+     */
     public int getOpponentColor() {
         return opponentColor;
+    }
+
+    /**
+     * ゲーム終了チェック
+     * @return ゲーム終了状態の場合はTrueを返す、それ以外はFalseを返す
+     */
+    public boolean isTerminal() {
+        // 1. 盤面が埋まっているかチェック
+        if (countStones(EMPTY) == 0) {
+            return true;
+        }
+        
+        // 2. どちらのプレイヤーも打てる手がないかチェック
+        // 注: Board.javaには、現在の盤面の状態から次のプレイヤー（相手）の合法手がないかチェックするロジックが必要
+        if (getLegalMoves(BLACK).isEmpty() && getLegalMoves(WHITE).isEmpty()) {
+            return true;
+        }
+
+        // 3. どちらかの石がゼロになったかチェック
+        if (countStones(BLACK) == 0 || countStones(WHITE) == 0) {
+            return true;
+        }
+        
+        return false;
     }
 }
