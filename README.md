@@ -36,8 +36,7 @@
 
 ```bash
 mkdir -p classes
-javac -d classes *.java
-jar cvfm SampleAI.jar Manifest.txt -C classes .
+javac -d classes  -source 21 -target 21 *.java; jar cvfm SampleAI.jar Manifest.txt -C classes .
 
 ```
 
