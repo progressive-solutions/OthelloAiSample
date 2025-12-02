@@ -1,4 +1,5 @@
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Scanner;
 
 /**
@@ -8,42 +9,53 @@ import java.util.Scanner;
  */
 public class AIEntry {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        PrintWriter writer = new PrintWriter(System.out, true);
-        
-        int myColor = 0; // 1:BLACK, 2:WHITE
-        
-        // プロトコルに従い、ジャッジからの命令を処理
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine().trim();
+        try {
+            Scanner scanner = new Scanner(System.in);
+            PrintWriter writer = new PrintWriter(System.out, true);
             
-            if (line.startsWith("COLOR")) {
-                // 初期設定：自分の石の色を受け取る
-                try {
-                    myColor = Integer.parseInt(line.split(" ")[1]);
-                } catch (Exception e) {
-                    // エラー処理（ここでは省略）
+            int myColor = 0; // 1:BLACK, 2:WHITE
+            
+            // プロトコルに従い、ジャッジからの命令を処理
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                
+                if (line.startsWith("COLOR")) {
+                    // 初期設定：自分の石の色を受け取る
+                    try {
+                        myColor = Integer.parseInt(line.split(" ")[1]);
+                    } catch (Exception e) {
+                        // エラー処理（ここでは省略）
+                    }
+                } else if (line.startsWith("MOVE BOARD:")) {
+                    // 手番通知：思考開始を指示
+                    String boardString = line.substring("MOVE BOARD:".length());
+                    
+                    // 盤面をBoardオブジェクトに変換
+                    Board currentBoard = new Board(myColor);
+                    currentBoard.initialize(boardString);
+                    
+                    // 思考エンジンを呼び出す
+                    ThinkingEngine engine = new ThinkingEngine();
+                    String move = engine.think(currentBoard); 
+                    
+                    // 着手結果を出力
+                    writer.println(move);
+                    
+                } else if (line.startsWith("QUIT")) {
+                    // 終了指示
+                    break;
                 }
-            } else if (line.startsWith("MOVE BOARD:")) {
-                // 手番通知：思考開始を指示
-                String boardString = line.substring("MOVE BOARD:".length());
-                
-                // 盤面をBoardオブジェクトに変換
-                Board currentBoard = new Board(myColor);
-                currentBoard.initialize(boardString);
-                
-                // 思考エンジンを呼び出す
-                ThinkingEngine engine = new ThinkingEngine();
-                String move = engine.think(currentBoard); 
-                
-                // 着手結果を出力
-                writer.println(move);
-                
-            } else if (line.startsWith("QUIT")) {
-                // 終了指示
-                break;
             }
+            scanner.close();
+        } catch (Exception e) {
+            String log = "[ERROR]" + e.getMessage() + ":" + getStackTraceAsString(e);
+            System.out.println(log);
         }
-        scanner.close();
+    }
+    public static String getStackTraceAsString(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString().replaceAll("\\r\\n|\\r|\\n", " "); // 改行を取る
     }
 }
